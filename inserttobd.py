@@ -28,7 +28,11 @@ punc_mark = ['.', ',', '?', '!', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9
 new_line = ''
 percent = 0
 # Getting and printing files in directory Text1
-files = os.listdir('./Text1')
+if __debug__:
+	direc = './Test'
+else:
+	direc = './Text1'
+files = os.listdir(direc)
 files.sort()
 print 'Files:'
 for file in files:
@@ -48,7 +52,7 @@ for file in files:
 		conn.commit()
 		author_id = cur.lastrowid
 		new_line = ''
-		with open('./Text1/' + file, 'r') as f:
+		with open(direc + '/' + file, 'r') as f:
 			for line in f.readlines():
 				for let in line:
 					if not(let in punc_mark):

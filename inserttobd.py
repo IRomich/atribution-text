@@ -38,13 +38,18 @@ print 'Files:'
 for file in files:
 	print file
 # Opening connection with database
-conn = sqlite3.connect('atribution_text')
+if __debug__:
+	conn = sqlite3.connect('test')
+else:
+	conn = sqlite3.connect('atribution_text')
 cur = conn.cursor()
 count = 0
 # Reading line from input file and concating its in one line
 for file in files:
 	count += 1
 	ind = file.find('.')
+	if __debug__ and file.find('1') != -1 :
+		continue
 	cur.execute("SELECT author FROM authors WHERE author='%s'"%file[:ind])
 	flag = cur.fetchone()
 	if not(flag):
@@ -94,8 +99,8 @@ for file in files:
 	if __debug__:
 		print count
 		print "Elapsed time: {:.3f} sec".format(time.time() - tim)
-	percent += 10
-	print 'Complete ' + str(percent) + '%'
+	percent += 1
+	print 'Complete ' + str(1.0 * percent / len(files) * 100)  + '%'
 
 if __debug__:
 	print "Elapsed time: {:.3f} sec".format(time.time() - tim)

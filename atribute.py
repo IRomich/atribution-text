@@ -10,7 +10,7 @@ import os
 # Importing module for work with time
 import time 
 
-# Funtion for searching of entrance of a line in the list
+# Function for searching of entrance of a line in the list
 def search(t, f):
 	numb = 0
 	for i in t:
@@ -20,15 +20,13 @@ def search(t, f):
 	
 	return -1
 
-
-
 if __debug__:
 	tim = time.time()
 punc_mark = ['.', ',', '?', '!', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_', '"', '-', ':', 'N', '(', ')', '[', ']', 
 ';', '—', 'X', 'I', 'V', '\r', '\n', ' ', '\'', 'a', 'b', 'c', 'd', 'e', 'f', '–', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 
 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 new_line = ''
-# Getting and printing files in directory Text1
+# Getting and printing files in directory Text2
 if __debug__:
 	direc = './Test'
 else:
@@ -37,7 +35,7 @@ files = os.listdir(direc)
 files.sort()
 print 'Files:'
 i = 0
-similarity = []
+difference = []
 for file in files:
 	i += 1
 	print str(i) + ' ' + file
@@ -68,11 +66,13 @@ while (i < len(new_line) - 2):
 	i += 1
 # Sort list of triads
 triads.sort()
-print triads
 # Opening connection with database
-conn = sqlite3.connect('atribution_text')
+if __debug__:
+	conn = sqlite3.connect('test')
+else:
+	conn = sqlite3.connect('atribution_text')
 cur = conn.cursor()
-# Reading line from input file and concating its in one line
+# Get authors list from database
 cur.execute("SELECT * FROM authors")
 authors = cur.fetchall()
 for author in authors:
@@ -80,27 +80,24 @@ for author in authors:
 					FROM author_has_triad, triads 
 					WHERE author_has_triad.author_id=%s AND author_has_triad.triad_id=triads.id"""%(author[0]))
 	distribution = cur.fetchall()
-	#print distribution
+	if __debug__:
+		print distribution
 	# Comparision
-	tmp = 0
-	count = 0
+	tmp = 0.0
+	count = 0.0
 	for triad in distribution:
-		numb = search(triads, triad[0])
-		if numb != False:
-			if triad[1] < triads[numb][1]:
-				tmp += 1.0 * (triads[numb][1] - triad[1]) / triads[numb][1] 
-			elif triad[0] > triads[numb][1]:
-				tmp += 1.0 * (triad[1] - triads[numb][1]) / triad[1]
-			else:
-				tmp += 1
+		ind = search(triads, triad[0])
+		if ind != -1:
+			tmp += 1.0 * abs(triads[ind][1] - triad[1]) / triad[1]
 		else:
-			count += 1 
-	count += len(triads) - len(distribution) + count
-	print count
-	similarity.append(1.0 * tmp / (len(distribution) - count)) 
+			count += triad[1] 
+	for triad in triads:
+		if (search(distribution, triad[0]) == -1):
+			count += triad[1]
+	difference.append(1.0 * (count + tmp) / len(distribution)) #list_sum(distribution))
 
-print similarity
-print authors[similarity.index(min(similarity))][1] 
+print difference
+print authors[difference.index(min(difference))][1] 
 if __debug__:
 	print "Elapsed time: {:.3f} sec".format(time.time() - tim)
 # Closing connection with database

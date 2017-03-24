@@ -89,7 +89,7 @@ for file in files:
 			cur.execute("INSERT INTO author_has_triad(author_id, triad_id, quantity) VALUES ('%i','%i', '%i')"%(author_id, triad_id, triad[1]))
 		# Execute transaction 
 		conn.commit()
-	# Output compkete percent and spent time 	
+	# Output complete percent and spent time 	
 	print 'Complete ' + str(1.0 * count / len(files) * 100)  + '%'
 	print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 

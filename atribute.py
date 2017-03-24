@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Importing module for encoding/decoding
+# Import module for encoding/decoding
 import codecs
-# Importing module for work with SQLite database
+# Import module for work with SQLite database
 import sqlite3
-# Importing module for work with operating system
-import os
-# Importing module for work with time
+# Import module for work with operating system
+import os 
+# Import module for work with time
 import time 
 
 # Function for searching of entrance of a line in the list
@@ -20,59 +20,53 @@ def search(t, f):
 	
 	return -1
 
-if __debug__:
-	tim = time.time()
-punc_mark = ['.', ',', '?', '!', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_', '"', '-', ':', 'N', '(', ')', '[', ']', 
-';', '—', 'X', 'I', 'V', '\r', '\n', ' ', '\'', 'a', 'b', 'c', 'd', 'e', 'f', '–', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 
-'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-new_line = ''
-# Getting and printing files in directory Text2
-if __debug__:
-	direc = './Test'
-else:
-	direc = './Text2'
-files = os.listdir(direc)
+# Saving current time
+start_time = time.time()
+# Getting 'alphabet' from file and decoding it from utf 8, splitting by ','
+alphabet = open("alphabet", "r").read().decode('utf8', 'ignore').split(',')
+# Getting, sorting and printing files with numbers in directory Text1
+folder = 'Text1'
+files = os.listdir(folder)
 files.sort()
-print 'Files:'
+print 'Files in folder \'' + folder + '\':'
 i = 0
-difference = []
 for file in files:
 	i += 1
 	print str(i) + ' ' + file
 num = int(input('Input file number: '))
+difference = []
 new_line = ''
-with open(direc + '/' + files[num - 1], 'r') as f:
-	for line in f.readlines():
-		for let in line:
-			if not(let in punc_mark):
-				new_line += let
-			elif let != '\n':
-				if new_line[len(new_line) - 1:len(new_line)] != ' ':
-					new_line += ' '
-						
-# Print turned-out line		
-new_line = new_line.decode('utf-8').lower()
+lines = open(folder + '/' + file, 'r').read().decode('utf8', 'ignore')
+for line in lines:
+	for let in line:
+		if let in alphabet:
+			new_line += let
+		elif new_line[len(new_line) - 1:len(new_line)] != ' ':
+			new_line += ' '
+# Translation to lower register	
+new_line = new_line.lower()
 # Splitting text into triads
 i = 0
 triads = []
 while (i < len(new_line) - 2):
 	temp = 0
+	# If middle element is not space
 	if (new_line[i + 1] != ' '):
+		# Search current triad in triads list 
 		temp = search(triads, new_line[i:i + 3])
 		if (temp != -1):
+			# Increment count founded triad
 			triads[temp][1] += 1
 		else:
+			# Add new triad
 			triads.append([new_line[i:i + 3], 1])
 	i += 1
-# Sort list of triads
+# Sort triads list
 triads.sort()
 # Opening connection with database
-if __debug__:
-	conn = sqlite3.connect('test')
-else:
-	conn = sqlite3.connect('atribution_text')
+conn = sqlite3.connect('atribution_text')
 cur = conn.cursor()
-# Get authors list from database
+# Getting authors list from database
 cur.execute("SELECT * FROM authors")
 authors = cur.fetchall()
 for author in authors:
@@ -80,8 +74,6 @@ for author in authors:
 					FROM author_has_triad, triads 
 					WHERE author_has_triad.author_id=%s AND author_has_triad.triad_id=triads.id"""%(author[0]))
 	distribution = cur.fetchall()
-	if __debug__:
-		print distribution
 	# Comparision
 	tmp = 0.0
 	count = 0.0
@@ -94,12 +86,15 @@ for author in authors:
 	for triad in triads:
 		if (search(distribution, triad[0]) == -1):
 			count += triad[1]
-	difference.append(1.0 * (count + tmp) / len(distribution)) #list_sum(distribution))
+	difference.append(1.0 * (count + tmp) / len(distribution))
+	# Output complete percent and spent time 	
+	print 'Complete ' + str(1.0 * count / len(files) * 100)  + '%'
+	print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 
 print difference
-print authors[difference.index(min(difference))][1] 
-if __debug__:
-	print "Elapsed time: {:.3f} sec".format(time.time() - tim)
+print 'Most likely it is' + authors[difference.index(min(difference))][1] 
+# Output spent time for script work
+print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 # Closing connection with database
 cur.close()
 conn.close()

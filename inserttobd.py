@@ -10,12 +10,11 @@ import os
 # Import module for work with time
 import time
 
-# Funtion for searching of entrance of a line in the list
+# Function for search element in list
 def search(t, f):
 	numb = 0
-	l = len(t)
-	while numb < l:
-		if t[numb] == f:
+	for i in t:
+		if i[0] == f:
 			return numb
 		numb += 1
 	return -1
@@ -90,7 +89,7 @@ for file in files:
 		# Execute transaction 
 		conn.commit()
 	# Output complete percent and spent time 	
-	print 'Complete ' + str(1.0 * count / len(files) * 100)  + '%'
+	print 'Completed ' + str(1.0 * count / len(files) * 100)  + '%'
 	print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 
 # Output spent time for script work

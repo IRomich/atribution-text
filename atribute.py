@@ -10,22 +10,21 @@ import os
 # Import module for work with time
 import time 
 
-# Function for searching of entrance of a line in the list
+# Function for search element in list
 def search(t, f):
 	numb = 0
 	for i in t:
-		if (i[0] == f):
+		if i[0] == f:
 			return numb
 		numb += 1
-	
 	return -1
 
 # Saving current time
 start_time = time.time()
 # Getting 'alphabet' from file and decoding it from utf 8, splitting by ','
 alphabet = open("alphabet", "r").read().decode('utf8', 'ignore').split(',')
-# Getting, sorting and printing files with numbers in directory Text1
-folder = 'Text1'
+# Getting, sorting and printing files with numbers in directory Text2
+folder = './Text2'
 files = os.listdir(folder)
 files.sort()
 print 'Files in folder \'' + folder + '\':'
@@ -34,9 +33,8 @@ for file in files:
 	i += 1
 	print str(i) + ' ' + file
 num = int(input('Input file number: '))
-difference = []
 new_line = ''
-lines = open(folder + '/' + file, 'r').read().decode('utf8', 'ignore')
+lines = open(folder + '/' + files[num - 1], 'r').read().decode('utf8', 'ignore')
 for line in lines:
 	for let in line:
 		if let in alphabet:
@@ -66,6 +64,8 @@ triads.sort()
 # Opening connection with database
 conn = sqlite3.connect('atribution_text')
 cur = conn.cursor()
+difference = []
+complete = 0
 # Getting authors list from database
 cur.execute("SELECT * FROM authors")
 authors = cur.fetchall()
@@ -88,11 +88,12 @@ for author in authors:
 			count += triad[1]
 	difference.append(1.0 * (count + tmp) / len(distribution))
 	# Output complete percent and spent time 	
-	print 'Complete ' + str(1.0 * count / len(files) * 100)  + '%'
+	complete += 1
+	print 'Completed ' + str(100.0 * complete / len(files))  + '%'
 	print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 
 print difference
-print 'Most likely it is' + authors[difference.index(min(difference))][1] 
+print 'Most likely it is ' + authors[difference.index(min(difference))][1] 
 # Output spent time for script work
 print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 # Closing connection with database

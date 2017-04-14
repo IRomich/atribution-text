@@ -89,11 +89,11 @@ for author in authors:
 	difference.append(1.0 * (count + tmp) / len(distribution))
 	# Output complete percent and spent time 	
 	complete += 1
-	print 'Completed ' + str(100.0 * complete / len(files))  + '%'
+	print 'Completed ' + str(100.0 * complete / len(authors))  + '%'
 	print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 
 print difference
-print 'Most likely it is ' + authors[difference.index(min(difference))][1] 
+print 'Most likely it is ' + authors[difference.index(min(difference))][1] #+ ' ' + authors[difference.index(min(difference))][2]
 # Output spent time for script work
 print 'Elapsed time: {:.3f} sec'.format(time.time() - start_time)
 # Closing connection with database

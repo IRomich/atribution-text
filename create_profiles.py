@@ -37,7 +37,7 @@ count = 0
 for file in files:
 	count += 1
 	ind = file.find('.')
-	cur.execute("SELECT author FROM authors WHERE author='%s'"%file[:ind])
+	cur.execute("SELECT author FROM authors WHERE author='%s' AND text='%s'"%(file[:ind], file[ind + 1:]))
 	if not(cur.fetchone()):
 		cur.execute("INSERT INTO authors(author, text) VALUES ('%s','%s')"%(file[:ind], file[ind + 1:]))
 		conn.commit()
